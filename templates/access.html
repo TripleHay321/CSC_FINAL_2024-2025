@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block title %}Staff Access{% endblock %}
+
+{% block content %}
+<div class="bg-white p-8 rounded-2xl shadow-lg max-w-2xl w-full">
+  <h1 class="text-2xl font-bold mb-6 text-center text-gray-800">Staff Access</h1>
+
+  <div class="mb-4">
+    <label class="block text-gray-700 mb-2">Plate Number:</label>
+    <input type="text" id="plate_number" required
+           class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+  </div>
+
+  <button onclick="captureAndVerify()"
+          class="w-full bg-blue-600 text-white py-2 rounded-xl hover:bg-blue-700 transition mb-6">
+    Verify Face
+  </button>
+
+  <!-- Face capture space (unstyled for functional clarity) -->
+  <video id="video" width="320" height="240" autoplay class="mx-auto"></video>
+
+  <!-- QR Scanner Section -->
+  <div id="qr_input" class="mt-6" style="display:none;">
+    <label class="block text-gray-700 mb-2">Scan QR Code:</label>
+    <div id="reader" class="border border-gray-300 rounded-xl p-4"></div>
+    <p id="qr-result" class="mt-4 text-sm text-gray-600">
+      Scanned QR Code: <span id="qr-content" class="font-medium text-gray-800"></span>
+    </p>
+  </div>
+
+  <p id="result" class="mt-4 text-center font-medium text-gray-700"></p>
+</div>
+
+<script src="https://unpkg.com/html5-qrcode"></script>
+
+<script>
+  const video = document.getElementById('video');
+  let userId = null;
+  let qrScanner = null;
+
+  // Start webcam
+  navigator.mediaDevices.getUserMedia({ video: true })
+    .then(stream => { video.srcObject = stream; })
+    .catch(console.error);
+
+  function captureAndVerify() {
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext('2d').drawImage(video, 0, 0);
+    const dataURL = canvas.toDataURL('image/jpeg', 0.7);
+
+    fetch("/verify_plate", {
+      method: "POST",
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        plate_number: document.getElementById("plate_number").value,
+        face_image: dataURL
+      })
+    })
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById("result").textContent = data.message;
+
+      if (data.status === "success") {
+        userId = data.user_id;
+        document.getElementById("qr_input").style.display = "block";
+
+        qrScanner = new Html5Qrcode("reader");
+        qrScanner.start(
+          { facingMode: "environment" },
+          { fps: 10, qrbox: 250 },
+          onScanSuccess,
+          onScanError
+        );
+      }
+    });
+  }
+
+  function onScanSuccess(decodedText, decodedResult) {
+    document.getElementById('qr-content').textContent = decodedText;
+
+    if (!userId) {
+      alert("Face must be verified first.");
+      return;
+    }
+
+    fetch("/verify_qr", {
+      method: "POST",
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        user_id: userId,
+        qr_code: decodedText
+      })
+    })
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById("result").textContent = data.message;
+
+      if (data.status === "success") {
+        qrScanner.stop().then(() => {
+          document.getElementById("reader").innerHTML = "";
+          alert("✅ Access Granted!");
+          window.location.href = "/";
+        });
+      } else {
+        alert("❌ QR Code mismatch. Warning sent.");
+      }
+    });
+  }
+
+  function onScanError(errorMessage) {
+    console.warn("QR Code Scan Error:", errorMessage);
+  }
+</script>
+{% endblock %}

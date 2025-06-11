@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Staff Login{% endblock %}
+
+{% block content %}
+<div class="bg-white p-8 rounded-2xl shadow-lg max-w-md w-full text-center">
+  <h1 class="text-2xl font-bold mb-6 text-gray-800">Staff Login</h1>
+
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <ul class="mb-4 text-red-600 font-medium">
+        {% for msg in messages %}
+          <li>{{ msg }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
+
+  <form method="POST" class="space-y-4">
+    <input type="password" name="secret_key" placeholder="Secret Key" required
+           class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+    <button type="submit"
+            class="w-full bg-blue-600 text-white py-2 rounded-xl hover:bg-blue-700 transition">
+      Login
+    </button>
+  </form>
+</div>
+{% endblock %}

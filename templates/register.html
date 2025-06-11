@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<div class="bg-white p-10 rounded-2xl shadow-lg w-full max-w-lg">
+  <h1 class="text-2xl font-bold mb-6 text-gray-800 text-center">Register User</h1>
+
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <ul class="mb-4">
+        {% for msg in messages %}
+          <li class="text-red-600 text-sm">{{ msg }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
+
+  <form method="POST" class="space-y-4">
+    <div>
+      <label class="block font-medium">Name</label>
+      <input type="text" name="name" required class="w-full border rounded-xl px-4 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-blue-400">
+    </div>
+    <div>
+      <label class="block font-medium">Email</label>
+      <input type="email" name="email" required class="w-full border rounded-xl px-4 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-blue-400">
+    </div>
+    <div>
+      <label class="block font-medium">Phone Number</label>
+      <input type="text" name="phone" required class="w-full border rounded-xl px-4 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-blue-400">
+    </div>
+    <div>
+      <label class="block font-medium">Car Color</label>
+      <input type="text" name="car_color" required class="w-full border rounded-xl px-4 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-blue-400">
+    </div>
+    <div>
+      <label class="block font-medium">Plate Number</label>
+      <input type="text" name="plate_number" required class="w-full border rounded-xl px-4 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-blue-400">
+    </div>
+    <div class="text-center">
+      <button type="submit" class="w-full bg-blue-600 text-white px-6 py-3 rounded-xl shadow hover:bg-blue-700 transition duration-300">
+        Proceed to Face Registration
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}
