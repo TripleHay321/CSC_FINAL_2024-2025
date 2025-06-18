@@ -187,8 +187,8 @@ def verify_plate():
         })
     else:
         subject = "Access Alert: Face Mismatch"
-        body = f"Hi {name},\n\nAn unauthorized face scan was attempted at {datetime.now()}."
-        send_email_alert(email, subject, body)
+        body = render_template('email_alert.html', name=name, plate_number=plate_number, alert_type="Face Scan Mismatch", timestamp=str(datetime.now()))
+        send_email_alert(email, subject, body,)
         return jsonify({"status": "fail", "message": "❌ Face mismatch. Alert email sent."})
 
 

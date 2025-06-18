@@ -13,10 +13,10 @@ def generate_qr(data):
     return filename
 
 def send_email_alert(email, subject, body):
-    sender = "youremail@example.com"
-    password = "yourpassword"
+    sender = "akinwumistudents05@gmail.com"
+    password = "ygri muzv xpdw futc"
 
-    msg = MIMEText(body)
+    msg = MIMEText(body, 'html')
     msg["Subject"] = subject
     msg["From"] = sender
     msg["To"] = email
