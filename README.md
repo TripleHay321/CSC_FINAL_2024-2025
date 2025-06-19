@@ -110,8 +110,8 @@ PythonProject/
 ### Installation
 
 ```bash
-git clone https://github.com/TripleHay321/CSC_FINAL_2024-2025.git
-cd SecureGate
+git clone https://github.com/TripleHay321/CSC_FINAL_2024-2025
+cd CSC_FINAL_2024-2025
 python -m venv venv
 source venv/bin/activate  # Windows: venv\Scripts\activate
 pip install -r requirements.txt
