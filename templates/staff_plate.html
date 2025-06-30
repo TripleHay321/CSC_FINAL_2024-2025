@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}Verify Plate{% endblock %}
+{% block content %}
+<div class="min-h-screen flex items-center justify-center flex-col text-center" id="register-con">
+    <div class="col-md-6 d-flex flex-column align-items-center justify-content-center text-center mb-4 mb-md-0">
+        <div class="col-md-12 p-5 rounded-3 rounded-shadow box">
+            <div class="flex items-center justify-center">
+                <img src="{{ url_for('static', filename='css/IMG/image 1.png') }}" alt="">
+            </div>
+            <h1 class="text-2xl font-bold mb-6 text-gray-800">STAFF LOGIN</h1>
+
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                <ul class="mb-4 text-red-600 font-medium">
+                    {% for msg in messages %}
+                    <li>{{ msg }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST" class="text-left">
+                <label class="block mb-2 font-medium text-gray-700">Plate Number:</label><br>
+                <input type="text" name="plate_number" required placeholder="Enter Plate Number"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-xl mb-4 focus:ring-2 focus:ring-blue-500">
+                <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-xl hover:bg-blue-700 transition">
+                PROCEED TO FACIAL VERIFICATION
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

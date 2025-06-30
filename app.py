@@ -27,6 +27,7 @@ def init_db():
             name TEXT,
             email TEXT,
             phone TEXT,
+            car_type TEXT,
             car_color TEXT,
             plate_number TEXT UNIQUE,
             qr_code TEXT,
@@ -58,10 +59,11 @@ def register():
         name = request.form['name']
         email = request.form['email']
         phone = request.form['phone']
+        car_type = request.form['car_type']
         car_color = request.form['car_color']
         plate_number = request.form['plate_number']
 
-        if not all([name, email, phone, car_color, plate_number]):
+        if not all([name, email, phone, car_type, car_color, plate_number]):
             flash("All fields are required.")
             return redirect(url_for('register'))
 
@@ -73,8 +75,8 @@ def register():
             flash("Plate number already registered.")
             return redirect(url_for('register'))
 
-        cursor.execute("INSERT INTO users (name, email, phone, car_color, plate_number) VALUES (?, ?, ?, ?, ?)",
-                       (name, email, phone, car_color, plate_number))
+        cursor.execute("INSERT INTO users (name, email, phone, car_type, car_color, plate_number) VALUES (?, ?, ?, ?, ?, ?)",
+               (name, email, phone, car_type, car_color, plate_number))
         user_id = cursor.lastrowid
         conn.commit()
         conn.close()
@@ -115,7 +117,7 @@ def register_face(user_id):
         conn.close()
 
         qr_image_url = f"qr_codes/{qr_filename}"
-        return render_template("register_face.html", qr_image=qr_image_url)
+        return render_template("download_qrcode.html", qr_image=qr_image_url)
 
     return render_template('register_face.html', user_id=user_id)
 
@@ -125,7 +127,7 @@ def staff_login():
         secret = request.form.get('secret_key')
         if secret == "CSC2024/2025":  # your secret key
             session['staff_logged_in'] = True
-            return redirect(url_for('access_page'))
+            return redirect(url_for('staff_access'))
         else:
             flash('Invalid secret key.')
     return render_template('staff_login.html')
@@ -138,94 +140,98 @@ def access_page():
         return redirect(url_for('staff_login'))
     return render_template('access.html')
 
-@app.route('/verify_plate', methods=['POST'])
-def verify_plate():
-    data = request.json
-    plate_number = data.get('plate_number')
+@app.route('/staff_access', methods=['GET', 'POST'])
+def staff_access():
+    if request.method == 'POST':
+        plate_number = request.form['plate_number']
+        conn = sqlite3.connect('database.db')
+        cursor = conn.cursor()
+        cursor.execute("SELECT id FROM users WHERE plate_number=?", (plate_number,))
+        user = cursor.fetchone()
+        conn.close()
+        
+        if user:
+            user_id = user[0]
+            return redirect(url_for('verify_face', user_id=user_id))
+        else:
+            flash("Plate number is invalid.")
+    
+    return render_template("staff_plate.html")
 
-    # Extract base64 face image, removing prefix if present
-    image_data = data.get('face_image').split(',')[1]
+@app.route('/verify_face/<int:user_id>', methods=['GET', 'POST'])
+def verify_face(user_id):
+    if request.method == 'POST':
+        data = request.json
+        image_data = data['face_image'].split(',')[1]
+        img_array = np.frombuffer(base64.b64decode(image_data), np.uint8)
+        frame = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
 
-    # Decode image data and convert to numpy array
-    img_array = np.frombuffer(base64.b64decode(image_data), np.uint8)
-    frame = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
+        conn = sqlite3.connect('database.db')
+        cursor = conn.cursor()
+        cursor.execute("SELECT face_encoding, email, name FROM users WHERE id=?", (user_id,))
+        user = cursor.fetchone()
+        conn.close()
 
-    # Load user info and stored face encoding from DB
-    conn = sqlite3.connect('database.db')
-    cursor = conn.cursor()
-    cursor.execute("SELECT id, face_encoding, email, name FROM users WHERE plate_number=?", (plate_number,))
-    user = cursor.fetchone()
-    conn.close()
+        if not user:
+            return jsonify({"status": "fail", "message": "User not found."})
 
-    if not user:
-        return jsonify({"status": "fail", "message": "❌ Plate number not found."})
+        face_encoding_blob, email, name = user
+        if not face_encoding_blob:
+            return jsonify({"status": "fail", "message": "No face data registered."})
 
-    user_id, face_encoding_blob, email, name = user
-    known_encoding = np.frombuffer(face_encoding_blob, dtype=np.float64)
+        known_encoding = np.frombuffer(face_encoding_blob, dtype=np.float64)
 
-    # Detect faces in the uploaded image
-    face_locations = face_recognition.face_locations(frame)
-    if not face_locations:
-        return jsonify({"status": "fail", "message": "❌ No face detected."})
+        face_locations = face_recognition.face_locations(frame)
+        if not face_locations or len(face_locations) != 1:
+            return jsonify({"status": "fail", "message": "Face Not Recognized"})
 
-    if len(face_locations) != 1:
-        return jsonify({"status": "fail", "message": "❌ Please ensure only one face is visible."})
-
-    # Get encoding for the detected face
-    encoding = face_recognition.face_encodings(frame, face_locations)[0]
-
-    # Compare face encoding with stored encoding
-    match = face_recognition.compare_faces([known_encoding], encoding)[0]
-
-    if match:
-        # Store user ID in session to track successful face verification
-        session['face_verified_user_id'] = user_id
-        return jsonify({
-            "status": "success",
-            "user_id": user_id,
-            "message": f"✅ Face matched for {name}. Proceed to scan QR."
-        })
-    else:
-        subject = "Access Alert: Face Mismatch"
-        body = render_template('email_alert.html', name=name, plate_number=plate_number, alert_type="Face Scan Mismatch", timestamp=str(datetime.now()))
-        send_email_alert(email, subject, body,)
-        return jsonify({"status": "fail", "message": "❌ Face mismatch. Alert email sent."})
+        encoding = face_recognition.face_encodings(frame, face_locations)[0]
+        match = face_recognition.compare_faces([known_encoding], encoding)[0]
 
 
+        if match:
+            session['face_verified_user_id'] = user_id
+            return jsonify({"status": "success", "redirect": url_for('scan_qr', user_id=user_id)})
+        else:
+            subject = "Access Alert: Face Mismatch"
+            body = render_template('email_alert.html', name=name, alert_type="Face Mismatch", timestamp=datetime.now())
+            send_email_alert(email, subject, body)
+            return jsonify({"status": "fail", "message": "Face mismatch. Alert sent."})
+
+    return render_template('staff_face.html', user_id=user_id)
+
+@app.route('/scan_qr/<int:user_id>')
+def scan_qr(user_id):
+    if session.get('face_verified_user_id') != user_id:
+        flash("Face not verified.")
+        return redirect(url_for('staff_access'))
+    return render_template("staff_qr.html", user_id=user_id)
 
 @app.route('/verify_qr', methods=['POST'])
 def verify_qr():
-    data = request.json
+    data = request.get_json()
     user_id = data.get('user_id')
-    scanned_qr = data.get('qr_code')
-
-    verified_user_id = session.get('face_verified_user_id')
-    if int(verified_user_id) != int(user_id):
-        return jsonify({"status": "fail", "message": "❌ Face not verified. Please verify face first."})
+    scanned_code = data.get('qr_code')
 
     conn = sqlite3.connect('database.db')
     cursor = conn.cursor()
-    cursor.execute("SELECT email, qr_code, name FROM users WHERE id=?", (user_id,))
+    cursor.execute("SELECT qr_code, name, email FROM users WHERE id=?", (user_id,))
     user = cursor.fetchone()
     conn.close()
 
     if not user:
-        return jsonify({"status": "fail", "message": "User not found"})
+        return jsonify({"status": "fail", "message": "User not found."})
 
-    email, correct_qr, name = user
-    if scanned_qr == correct_qr:
-        # Clear session so it can't be reused
-        session.pop('face_verified_user_id', None)
-        return jsonify({
-            "status": "success",
-            "message": f"✅ Access Granted, {name}! Face and QR Code matched.",
-            "name": name
-        })
+    stored_code, name, email = user
+
+    if scanned_code == stored_code:
+        return jsonify({"status": "success", "message": f"Access granted to {name}."})
     else:
         subject = "Access Alert: QR Code Mismatch"
-        body = f"Hi {name},\n\nAn unauthorized QR code scan was attempted at {datetime.now()}."
+        body = render_template('email_alert.html', name=name, alert_type="QR Code Mismatch", timestamp=datetime.now())
         send_email_alert(email, subject, body)
-        return jsonify({"status": "fail", "message": "❌ QR code mismatch. Alert email sent."})
+        return jsonify({"status": "fail", "message": "QR Code mismatch. Alert sent."})
+
 
 from werkzeug.exceptions import RequestEntityTooLarge
 

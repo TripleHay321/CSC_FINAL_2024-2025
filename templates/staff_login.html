@@ -3,27 +3,34 @@
 {% block title %}Staff Login{% endblock %}
 
 {% block content %}
-<div class="bg-white p-8 rounded-2xl shadow-lg max-w-md w-full text-center">
-  <h1 class="text-2xl font-bold mb-6 text-gray-800">Staff Login</h1>
+<div class="min-h-screen flex items-center justify-center flex-col text-center" id="register-con">
+  <div class="col-md-6 d-flex flex-column align-items-center justify-content-center text-center mb-4 mb-md-0">
+    <div class="col-md-12 p-5 rounded-3 rounded-shadow box">
+      <div class="flex items-center justify-center">
+        <img src="{{ url_for('static', filename='css/IMG/image 1.png') }}" alt="">
+      </div>
+      <h1 class="text-2xl font-bold mb-6 text-gray-800">STAFF LOGIN</h1>
 
-  {% with messages = get_flashed_messages() %}
-    {% if messages %}
-      <ul class="mb-4 text-red-600 font-medium">
-        {% for msg in messages %}
-          <li>{{ msg }}</li>
-        {% endfor %}
-      </ul>
-    {% endif %}
-  {% endwith %}
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <ul class="mb-4 text-red-600 font-medium">
+            {% for msg in messages %}
+              <li>{{ msg }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      {% endwith %}
 
-  <form method="POST" class="space-y-4">
-    <input type="password" name="secret_key" placeholder="Secret Key" required
-           class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+      <form method="POST" class="space-y-4">
+        <input type="password" name="secret_key" placeholder="Secret Key" required
+              class="w-full border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
 
-    <button type="submit"
-            class="w-full bg-blue-600 text-white py-2 rounded-xl hover:bg-blue-700 transition">
-      Login
-    </button>
-  </form>
+        <button type="submit"
+                class="w-full btn btn-blue text-white py-2 rounded-xl hover:bg-blue-700 transition">
+          LOGIN
+        </button>
+      </form>
+    </div>
+  </div>  
 </div>
 {% endblock %}

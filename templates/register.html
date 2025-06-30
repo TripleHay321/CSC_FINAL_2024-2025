@@ -3,45 +3,54 @@
 {% block title %}Register{% endblock %}
 
 {% block content %}
-<div class="bg-white p-10 rounded-2xl shadow-lg w-full max-w-lg">
-  <h1 class="text-2xl font-bold mb-6 text-gray-800 text-center">Register User</h1>
+<div class="min-h-screen flex items-center justify-center" id="register-con">
+  <div class="col-md-6 d-flex flex-column align-items-center justify-content-center text-center mb-4 mb-md-0">
+    <div class="">
+      <h2 class="fw-bold fs-2 pb-2">COMPLETE YOUR REGISTRATION</h2>
+      <div class="flex items-center justify-center pb-3">
+        <img src="{{ url_for('static', filename='css/IMG/progress bar (2).png') }}" alt="one">
+      </div>
+    </div>
 
-  {% with messages = get_flashed_messages() %}
-    {% if messages %}
-      <ul class="mb-4">
-        {% for msg in messages %}
-          <li class="text-red-600 text-sm">{{ msg }}</li>
-        {% endfor %}
-      </ul>
-    {% endif %}
-  {% endwith %}
+    <div class="col-md-10">
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          {% for message in messages %}
+            <div class="text-red-600 mt-4 text-center">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
 
-  <form method="POST" class="space-y-4">
-    <div>
-      <label class="block font-medium">Name</label>
-      <input type="text" name="name" required class="w-full border rounded-xl px-4 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-blue-400">
+      <form class="text-left p-5 rounded-3 rounded-shadow box" method="POST">
+        <div class="mb-3">
+          <label for="name" class="form-label fw-bold">Name</label><br>
+          <input type="text" name="name" class="form-control borders-secondary" required>
+        </div>
+        <div class="mb-3">
+          <label for="email" class="form-label fw-bold">Email</label><br>
+          <input class="form-control borders-secondary" type="email" name="email" required>
+        </div>
+        <div class="mb-3">
+          <label for="telephone" class="form-label fw-bold">Phone Number</label><br>
+          <input class="form-control borders-secondary" type="text" name="phone" required >
+        </div>
+        <div class="mb-3">
+          <label for="car_type" class="form-label fw-bold">Car Type</label><br>
+          <input class="form-control borders-secondary" type="text" name="car_type" required>
+        </div>
+        <div class="mb-3">
+          <label for="car_color" class="form-label fw-bold">Car Color</label><br>
+          <input class="form-control borders-secondary" type="text" name="car_color" required>
+        </div>
+        <div class="mb-3">
+          <label for="plate_number" class="form-label fw-bold">Plate Number</label><br>
+          <input class="form-control borders-secondary" type="text" name="plate_number" required>
+        </div>
+        <div class="text-center MB'">
+          <input class="btn btn-blue text-light" type="submit" value="PROCEED TO FACIAL RECOGNITION">
+        </div>
+      </form>
     </div>
-    <div>
-      <label class="block font-medium">Email</label>
-      <input type="email" name="email" required class="w-full border rounded-xl px-4 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-blue-400">
-    </div>
-    <div>
-      <label class="block font-medium">Phone Number</label>
-      <input type="text" name="phone" required class="w-full border rounded-xl px-4 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-blue-400">
-    </div>
-    <div>
-      <label class="block font-medium">Car Color</label>
-      <input type="text" name="car_color" required class="w-full border rounded-xl px-4 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-blue-400">
-    </div>
-    <div>
-      <label class="block font-medium">Plate Number</label>
-      <input type="text" name="plate_number" required class="w-full border rounded-xl px-4 py-2 mt-1 focus:outline-none focus:ring-2 focus:ring-blue-400">
-    </div>
-    <div class="text-center">
-      <button type="submit" class="w-full bg-blue-600 text-white px-6 py-3 rounded-xl shadow hover:bg-blue-700 transition duration-300">
-        Proceed to Face Registration
-      </button>
-    </div>
-  </form>
+  </div>
 </div>
 {% endblock %}

@@ -1,0 +1,22 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: content-box;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.btn-blue {
+    background: #1D72F0;
+}
+
+.btn-grey {
+    background: #A2A3A5;
+    border: 1px solid #545353;
+}
+
+.box {
+    background: #F9F9F9;
+}

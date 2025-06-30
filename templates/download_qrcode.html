@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}Download QR Code{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center flex-col text-center pt-5" id="register-con">
+    <div class="">
+    <h2 class="fw-bold fs-2 pb-2">COMPLETE YOUR REGISTRATION</h2>
+    <div class="flex items-center justify-center pb-3">
+        <img src="{{ url_for('static', filename='css/IMG/progress bar (3).png') }}" alt="one">
+    </div>
+</div>
+  <div class="col-md-6 d-flex flex-column align-items-center justify-content-center text-center mb-4 mb-md-0">
+
+    <div class="rounded-3 rounded-shadow box" style="padding: 15% 10%;">
+        <p class="d-flex items-center justify-center py-3">
+          <svg xmlns="http://www.w3.org/2000/svg" width="3em" height="3em" viewBox="0 0 24 24">
+            <mask id="lineMdConfirmCircleFilled0">
+                <g fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                    <path fill="#fff" fill-opacity="0" stroke-dasharray="64" stroke-dashoffset="64" d="M3 12c0 -4.97 4.03 -9 9 -9c4.97 0 9 4.03 9 9c0 4.97 -4.03 9 -9 9c-4.97 0 -9 -4.03 -9 -9Z">
+                        <animate fill="freeze" attributeName="fill-opacity" begin="0.6s" dur="0.5s" values="0;1" />
+                        <animate fill="freeze" attributeName="stroke-dashoffset" dur="0.6s" values="64;0" />
+                    </path>
+                    <path stroke="#000" stroke-dasharray="14" stroke-dashoffset="14" d="M8 12l3 3l5 -5">
+                        <animate fill="freeze" attributeName="stroke-dashoffset" begin="1.1s" dur="0.2s" values="14;0" />
+                    </path>
+                </g>
+            </mask>
+            <rect width="24" height="24" fill="#1D72F0" mask="url(#lineMdConfirmCircleFilled0)" />
+          </svg>
+        </p>
+
+        <h2 class="fw-bold fs-4 pb-1">Registration Complete!</h2>
+        <p class="mb-3">Driver's details and face has been registered successfully.</p>
+  
+        <a href="{{ url_for('static', filename=qr_image) }}" download="qr_code.png" class="btn w-full btn-blue text-white">
+            Print QR-Code
+        </a>
+
+        <p class="mt-6"><a href="{{ url_for('home') }}" class="text-blue-600 text-decoration-none">Back to Home</a></p>
+    </div>
+</div>
+{% endblock %}

@@ -3,19 +3,28 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-<div class="bg-white p-10 rounded-2xl shadow-lg text-center space-y-6">
-  <h1 class="text-3xl font-bold text-gray-800">Welcome</h1>
-  <div class="flex flex-col md:flex-row gap-4 justify-center">
-    <a href="{{ url_for('register') }}">
-      <button class="px-6 py-3 bg-blue-600 text-white rounded-xl shadow hover:bg-blue-700 transition duration-300">
-        Register
-      </button>
-    </a>
-    <a href="{{ url_for('staff_login') }}">
-      <button class="px-6 py-3 bg-gray-700 text-white rounded-xl shadow hover:bg-gray-800 transition duration-300">
-        Staff Access
-      </button>
-    </a>
+<div class="min-h-screen flex items-center justify-center" id="container">
+  <div class="container w-auto text-center p-5 rounded-3 shadow-lg box">
+    <div class="flex items-center justify-center">
+      <img src="{{ url_for('static', filename='css/IMG/image 1.png') }}" alt="">
+    </div>
+    <h1 class="fw-bold fs-1 p-4">WELCOME</h1>
+    <h3 class="fw-bold fs-5 pb-1">AAUA Vehicle Access Control system</h3>
+    <p class="pb-5 fw-semibold">Secure Access Control System Using QR-Code & Facial recognition</p>
+    <div>
+      <a href="{{ url_for('register') }}">
+        <button class="btn btn-blue fw-semibold text-light me-md-3 mb-2 mb-md-0">
+          <i class="fa-solid fa-file-circle-plus pe-2" style="color: #ffffff;"></i>
+          REGISTER
+        </button>
+      </a>
+      <a href="{{ url_for('staff_login') }}">
+        <button class="btn btn-grey text-black fw-semibold">
+          <i class="fa-solid fa-user-plus pe-2" style="color: #000;"></i>
+          STAFF ACCESS
+        </button>
+      </a>
+    </div>
   </div>
 </div>
 {% endblock %}
