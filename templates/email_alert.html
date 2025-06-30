@@ -1,24 +1,35 @@
 <!DOCTYPE html>
-<style>
-  .body {
-    background: #fff;
-    color: #333;
-   }
-</style>
-<html>
-  <body style="font-family: Arial, sans-serif; line-height:1.6; color:#333;">
-    <h2 style="color:#D32F2F;">Security Alert: AAUA Security</h2>
-      <div class="body">
-        <p>Hi <strong>{{ name }}</strong>,</p>
-        <p>An <strong style="color:#D32F2F;">unauthorized {{ alert_type }}</strong> was detected.</p>
-        <h3>Details:</h3>
-        <ul>
-          <li><strong>Plate Number:</strong> {{ plate_number }}</li>
-          <li><strong>Date and Time:</strong> {{ timestamp }}</li>
-        </ul>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Email Alert</title>
+  </head>
+  <body style="font-family: Arial, sans-serif; line-height: 1.6; background-color: #f9f9f9; padding: 20px; margin: 0;">
+    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 0 5px rgba(0,0,0,0.1);">
+      
+      <h2 style="color: #0d6efd; font-weight: bold; text-align: center;">Security Alert: AAUA Vehicle Access Control System</h2>
+
+      <div style="text-align: center; margin: 20px 0;">
+        <div style="display: inline-block; background-color: #f0281d; border-radius: 50%; width: 96px; height: 96px; line-height: 96px; font-size: 48px; color: white;">
+          &#10060;
+        </div>
       </div>
-    <p>If this wasn’t you, please <em style="color:#D32F2F;">contact support immediately</em>.</p>
-    <hr>
-    <p style="font-size:small; color:#999;">This is an automated message. Please do not reply.</p>
+
+      <p>Hi <strong>{{ name }}</strong>,</p>
+      <p>An <strong style="color: #0d6efd;">unauthorized {{ alert_type }}</strong> was detected.</p>
+
+      <h3 style="margin-top: 30px;">Details:</h3>
+      <ul style="padding-left: 0; list-style-type: none;">
+        <li style="margin-bottom: 8px;"><strong>Plate Number:</strong> {{ plate_number }}</li>
+        <li style="margin-bottom: 8px;"><strong>Car Type:</strong> {{ car_type }}</li>
+        <li style="margin-bottom: 8px;"><strong>Car Color:</strong> {{ car_color }}</li>
+        <li style="margin-bottom: 8px;"><strong>Date and Time:</strong> {{ timestamp }}</li>
+      </ul>
+
+      <p style="margin-top: 30px;">If this wasn’t you, please <em style="color: #0d6efd;">contact support immediately</em>.</p>
+      <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
+
+      <p style="font-size: small; color: #999; text-align: center;">This is an automated message. Please do not reply.</p>
+    </div>
   </body>
 </html>

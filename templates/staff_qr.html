@@ -17,7 +17,7 @@
         {% endif %}
       {% endwith %}
 
-      <p id="result" class="mt-4 text-gray-700 font-medium fs-3"></p>
+      <p id="result" class="mt-4 text-secondary fw-bold font-medium fs-5"></p>
       <div id="reader" class="border border-gray-300 rounded-3"></div>
       <!-- <p class="mt-4 text-sm text-gray-600">
         Scanned QR Code: <span id="qr-content" class="font-medium text-gray-800"></span>
@@ -29,6 +29,11 @@
 </div>
   
 <script>
+  window.addEventListener("beforeunload", function () {
+    // optional: make a logout request on leaving the page
+    navigator.sendBeacon("/logout");
+  });
+
   window.onload = function () {
     const qrContent = document.getElementById("qr-content");
     const result = document.getElementById("result");
@@ -57,7 +62,8 @@
               setTimeout(() => window.location.href = "/", 1500);
             });
           } else {
-            alert("QR Code mismatch. Warning sent.");
+            //alert("QR Code mismatch. Warning sent.");
+            console.log("qr Code mismatch")
           }
         });
       },

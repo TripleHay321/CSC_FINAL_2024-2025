@@ -10,8 +10,20 @@ from datetime import datetime
 from utils import send_email_alert
 from PIL import Image
 import io
+from functools import wraps
+
+def staff_login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not session.get('staff_logged_in'):
+            flash('Please login as staff to access this page.')
+            return redirect(url_for('staff_login'))
+        return f(*args, **kwargs)
+    return decorated_function
+
 
 app = Flask(__name__)
+# app.permanent_session_lifetime = 0  # immediate expiration
 app.secret_key = 'your-secret-key'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16 MB
 
@@ -126,6 +138,7 @@ def staff_login():
     if request.method == 'POST':
         secret = request.form.get('secret_key')
         if secret == "CSC2024/2025":  # your secret key
+            session.permanent = True  # session expires when browser/tab closes or reloads
             session['staff_logged_in'] = True
             return redirect(url_for('staff_access'))
         else:
@@ -134,6 +147,7 @@ def staff_login():
 
 
 @app.route('/access')
+@staff_login_required
 def access_page():
     if not session.get('staff_logged_in'):
         flash('Please login as staff to access this page.')
@@ -141,6 +155,7 @@ def access_page():
     return render_template('access.html')
 
 @app.route('/staff_access', methods=['GET', 'POST'])
+@staff_login_required
 def staff_access():
     if request.method == 'POST':
         plate_number = request.form['plate_number']
@@ -159,6 +174,7 @@ def staff_access():
     return render_template("staff_plate.html")
 
 @app.route('/verify_face/<int:user_id>', methods=['GET', 'POST'])
+@staff_login_required
 def verify_face(user_id):
     if request.method == 'POST':
         data = request.json
@@ -168,14 +184,14 @@ def verify_face(user_id):
 
         conn = sqlite3.connect('database.db')
         cursor = conn.cursor()
-        cursor.execute("SELECT face_encoding, email, name FROM users WHERE id=?", (user_id,))
+        cursor.execute("SELECT face_encoding, email, name, plate_number, car_type, car_color FROM users WHERE id=?", (user_id,))
         user = cursor.fetchone()
         conn.close()
 
         if not user:
             return jsonify({"status": "fail", "message": "User not found."})
 
-        face_encoding_blob, email, name = user
+        face_encoding_blob, email, name, plate_number, car_type, car_color = user
         if not face_encoding_blob:
             return jsonify({"status": "fail", "message": "No face data registered."})
 
@@ -194,13 +210,14 @@ def verify_face(user_id):
             return jsonify({"status": "success", "redirect": url_for('scan_qr', user_id=user_id)})
         else:
             subject = "Access Alert: Face Mismatch"
-            body = render_template('email_alert.html', name=name, alert_type="Face Mismatch", timestamp=datetime.now())
+            body = render_template('email_alert.html', name=name, alert_type="Face Mismatch", plate_number=plate_number, car_color=car_color, car_type=car_type, timestamp=datetime.now())
             send_email_alert(email, subject, body)
             return jsonify({"status": "fail", "message": "Face mismatch. Alert sent."})
 
     return render_template('staff_face.html', user_id=user_id)
 
 @app.route('/scan_qr/<int:user_id>')
+@staff_login_required
 def scan_qr(user_id):
     if session.get('face_verified_user_id') != user_id:
         flash("Face not verified.")
@@ -208,6 +225,7 @@ def scan_qr(user_id):
     return render_template("staff_qr.html", user_id=user_id)
 
 @app.route('/verify_qr', methods=['POST'])
+@staff_login_required
 def verify_qr():
     data = request.get_json()
     user_id = data.get('user_id')
@@ -215,22 +233,28 @@ def verify_qr():
 
     conn = sqlite3.connect('database.db')
     cursor = conn.cursor()
-    cursor.execute("SELECT qr_code, name, email FROM users WHERE id=?", (user_id,))
+    cursor.execute("SELECT qr_code, name, email, plate_number, car_type, car_color FROM users WHERE id=?", (user_id,))
     user = cursor.fetchone()
     conn.close()
 
     if not user:
         return jsonify({"status": "fail", "message": "User not found."})
 
-    stored_code, name, email = user
+    stored_code, name, email, plate_number, car_type, car_color = user
 
     if scanned_code == stored_code:
         return jsonify({"status": "success", "message": f"Access granted to {name}."})
     else:
         subject = "Access Alert: QR Code Mismatch"
-        body = render_template('email_alert.html', name=name, alert_type="QR Code Mismatch", timestamp=datetime.now())
+        body = render_template('email_alert.html', name=name, alert_type="QR Code Mismatch", plate_number=plate_number, car_color=car_color, car_type=car_type, timestamp=datetime.now())
         send_email_alert(email, subject, body)
         return jsonify({"status": "fail", "message": "QR Code mismatch. Alert sent."})
+    
+@app.route('/logout', methods=['GET', 'POST'])
+def logout():
+    session.clear()
+    return redirect(url_for('staff_login'))
+
 
 
 from werkzeug.exceptions import RequestEntityTooLarge

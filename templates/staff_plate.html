@@ -30,4 +30,10 @@
         </div>
     </div>
 </div>
+<script>
+    window.addEventListener("beforeunload", function () {
+    // optional: make a logout request on leaving the page
+    navigator.sendBeacon("/logout");
+  });
+</script>
 {% endblock %}

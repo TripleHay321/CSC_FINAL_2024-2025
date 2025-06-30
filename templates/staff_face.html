@@ -39,6 +39,11 @@
 </div>
 
 <script>
+  window.addEventListener("beforeunload", function () {
+    // optional: make a logout request on leaving the page
+    navigator.sendBeacon("/logout");
+  });
+
   const video = document.getElementById("video");
   const result = document.getElementById("result");
 
