@@ -73,7 +73,7 @@ SecureGate operates on a three-phase authentication model:
 ### Session and Security: **Flask Sessions**
 
 * Session variables track login state of staff and successful face verifications.
-* Routes like `/access` are protected from unauthorized users by checking session flags.
+* Routes like `/verify_plate, /verify_qr_code and /verify_face` are protected from unauthorized users by checking session flags.
 * Face verification must be completed before QR code is checked.
 
 ---
