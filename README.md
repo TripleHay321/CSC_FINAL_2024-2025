@@ -48,7 +48,7 @@ SecureGate operates on a three-phase authentication model:
 
 ### Frontend: **HTML, CSS, JavaScript**
 
-* Jinja templates (`register.html`, `register_face.html`, `access.html`, `email_alert.html`) render dynamic content.
+* Jinja templates (`register.html`, `register_face.html`, `download_qrcode.html`, `email_alert.html`, `staff_login.html`, `staff_plate.html`, `staff_face.html`, `email_alert.html`, `staff_qr.html`) render dynamic content.
 * JavaScript is used for:
 
   * Webcam access and image capture
@@ -66,14 +66,13 @@ SecureGate operates on a three-phase authentication model:
   * Type of alert (face mismatch or QR mismatch)
   * Time of attempt
   * Plate number
-  * (Optionally) IP address or location details
 * Uses Gmail SMTP on port 587; App Passwords are recommended for secure access.
 * Email body is rendered from an HTML template (`email_alert.html`) for a styled appearance.
 
 ### Session and Security: **Flask Sessions**
 
 * Session variables track login state of staff and successful face verifications.
-* Routes like `/verify_plate, /verify_qr_code and /verify_face` are protected from unauthorized users by checking session flags.
+* Routes like `/verify_plate`, `/scan_qr`  and `/verify_face` are protected from unauthorized users by checking session flags.
 * Face verification must be completed before QR code is checked.
 
 ---
@@ -81,21 +80,28 @@ SecureGate operates on a three-phase authentication model:
 ## 3. Project Structure
 
 ```bash
-PythonProject/
-├── app.py                  # Main Flask application
-├── utils.py                # Helper functions: email and QR code
-├── database.db             # SQLite database
+AAUA Vehicle Access Control system/
+├── app.py                    # Main Flask application
+├── utils.py                  # Helper functions: email and QR code
+├── database.db               # SQLite database
+├── requirements.txt          # List of required Python packages
+├── static/
+│   ├── css/
+│   │   └── style.css
+│   └── qr_codes/             # Stores generated QR codes
 ├── templates/
+│   ├── base.html
 │   ├── home.html
 │   ├── register.html
 │   ├── register_face.html
+│   ├── download_qrcode.html
 │   ├── staff_login.html
 │   ├── access.html
+│   ├── staff_plate.html
+│   ├── staff_face.html
+│   ├── staff_qr.html
 │   └── email_alert.html
-├── static/
-│   └── qr_codes/           # Stores generated QR codes
-├── face_data/              # Directory to store or cache facial data (if needed)
-└── requirements.txt        # List of required Python packages
+└── face_data/               # Directory to store or cache facial data (if needed)
 ```
 
 ---
